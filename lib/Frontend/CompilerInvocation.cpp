@@ -1575,7 +1575,7 @@ static bool ParseLangArgs(LangOptions &Opts, ArgList &Args,
       HadError = true;
     }
 
-    if (!FrontendOpts.InputsAndOutputs.isWholeModule()) {
+    if (!FrontendOpts.InputsAndOutputs.isWholeModule() && FrontendOptions::doesActionGenerateSIL(FrontendOpts.RequestedAction)) {
       Diags.diagnose(SourceLoc(), diag::wmo_with_embedded);
       HadError = true;
     }
@@ -1605,10 +1605,6 @@ static bool ParseLangArgs(LangOptions &Opts, ArgList &Args,
 
   Opts.DisableDynamicActorIsolation |=
       Args.hasArg(OPT_disable_dynamic_actor_isolation);
-
-  // @DebugDescription uses @_section and @_used attributes.
-  if (Opts.hasFeature(Feature::DebugDescriptionMacro))
-    Opts.enableFeature(Feature::SymbolLinkageMarkers);
 
 #if SWIFT_ENABLE_EXPERIMENTAL_PARSER_VALIDATION
   /// Enable round trip parsing via the new swift parser unless it is disabled
@@ -2603,9 +2599,9 @@ static bool ParseSILArgs(SILOptions &Opts, ArgList &Args,
   Opts.DisableSILPerfOptimizations |= Args.hasArg(OPT_disable_sil_perf_optzns);
   if (Args.hasArg(OPT_CrossModuleOptimization)) {
     Opts.CMOMode = CrossModuleOptimizationMode::Aggressive;
-  } else if (Args.hasArg(OPT_EnbaleDefaultCMO)) {
-    Opts.CMOMode = CrossModuleOptimizationMode::Default;  
-  } else if (Args.hasArg(OPT_EnbaleCMOEverything)) {
+  } else if (Args.hasArg(OPT_EnableDefaultCMO)) {
+    Opts.CMOMode = CrossModuleOptimizationMode::Default;
+  } else if (Args.hasArg(OPT_EnableCMOEverything)) {
     Opts.CMOMode = CrossModuleOptimizationMode::Everything;
   }
 

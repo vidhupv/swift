@@ -1020,11 +1020,11 @@ def PackageCMO : Flag<["-"], "package-cmo">,
   Flags<[FrontendOption]>,
   HelpText<"Enable optimization to perform defalut CMO within a package boundary">;
 
-def EnbaleDefaultCMO : Flag<["-"], "enable-default-cmo">,
+def EnableDefaultCMO : Flag<["-"], "enable-default-cmo">,
   Flags<[HelpHidden, FrontendOption]>,
   HelpText<"Perform conservative cross-module optimization">;
 
-def EnbaleCMOEverything : Flag<["-"], "enable-cmo-everything">,
+def EnableCMOEverything : Flag<["-"], "enable-cmo-everything">,
   Flags<[HelpHidden, FrontendOption]>,
   HelpText<"Perform cross-module optimization on everything (all APIs). "
            "This is the same level of serialization as Embedded Swift.">;
@@ -1376,7 +1376,7 @@ def target_cpu : Separate<["-"], "target-cpu">, Flags<[FrontendOption, ModuleInt
   HelpText<"Generate code for a particular CPU variant">;
 
 def target_variant : Separate<["-"], "target-variant">,
-  Flags<[FrontendOption]>,
+  Flags<[FrontendOption, ModuleInterfaceOption]>,
   HelpText<"Generate 'zippered' code for macCatalyst that can run on the specified"
            " variant target triple in addition to the main -target triple">;
 

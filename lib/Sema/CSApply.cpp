@@ -384,10 +384,12 @@ static bool willHaveConfusingConsumption(Type type,
   case ConstraintLocator::ApplyArgToParam: {
     auto argLoc = loc->castLastElementTo<LocatorPathElt::ApplyArgToParam>();
     auto paramFlags = argLoc.getParameterFlags();
-    if (paramFlags.getOwnershipSpecifier() == ParamSpecifier::Consuming)
-      return false; // Parameter already declares 'consuming'.
+    // If the param declares borrowing, then this implicit consumption
+    // due to the conversion to pass the argument is indeed confusing.
+    if (paramFlags.getOwnershipSpecifier() == ParamSpecifier::Borrowing)
+      return true;
 
-    return true;
+    return false;
   }
 
   default:
@@ -5409,8 +5411,8 @@ namespace {
         auto indexType = getTypeOfDynamicMemberIndex(overload);
         Expr *argExpr = nullptr;
         if (overload.choice.isKeyPathDynamicMemberLookup()) {
-          argExpr = buildKeyPathDynamicMemberArgExpr(
-              indexType->castTo<BoundGenericType>(), componentLoc, memberLoc);
+          argExpr = buildKeyPathDynamicMemberArgExpr(indexType, componentLoc,
+                                                     memberLoc);
         } else {
           auto fieldName = overload.choice.getName().getBaseIdentifier().str();
           argExpr = buildDynamicMemberLookupArgExpr(fieldName, componentLoc,

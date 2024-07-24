@@ -42,8 +42,7 @@ sil @transferKlassContainingKlasses : $@convention(thin) @async (@guaranteed Kla
 sil @useKlassContainingKlasses : $@convention(thin) (@guaranteed KlassContainingKlasses) -> ()
 sil @constructKlassContainingKlasses : $@convention(thin) () -> @owned KlassContainingKlasses
 
-@_moveOnly
-struct NonSendableMoveOnlyStruct {
+struct NonSendableMoveOnlyStruct: ~Copyable {
   var ns: NonSendableKlass
 
   deinit
@@ -645,14 +644,12 @@ bb0:
 
   fix_lifetime %value : $SendableKlass
 
-  // This is not considered a bad use of the raw pointer since this is
-  // sending to the same isolation domain.
   apply [caller_isolation=nonisolated] [callee_isolation=global_actor] %transferRawPointer(%rawPointer) : $@convention(thin) @async (Builtin.RawPointer) -> ()
   // expected-warning @-1 {{}}
+  // expected-note @-2 {{access can happen concurrently}}
 
   fix_lifetime %rawPointer : $Builtin.RawPointer
   // expected-note @-1 {{access can happen concurrently}}
-  // expected-note @-2 {{access can happen concurrently}}  
 
   destroy_value %value : $SendableKlass
   %9999 = tuple ()
@@ -725,10 +722,10 @@ bb0:
 
   apply [caller_isolation=nonisolated] [callee_isolation=global_actor] %transferRawPointer(%rawPointer) : $@convention(thin) @async (Builtin.RawPointer) -> ()
   // expected-warning @-1 {{}}
+  // expected-note @-2 {{access can happen concurrently}}
 
   fix_lifetime %rawPointer : $Builtin.RawPointer
   // expected-note @-1 {{access can happen concurrently}}
-  // expected-note @-2 {{access can happen concurrently}}
 
   destroy_value %value : $SendableKlass
   %9999 = tuple ()
@@ -804,10 +801,10 @@ bb0:
 
   apply [caller_isolation=nonisolated] [callee_isolation=global_actor] %transferRawPointer(%rawPointer) : $@convention(thin) @async (Builtin.RawPointer) -> ()
   // expected-warning @-1 {{}}
+  // expected-note @-2 {{access can happen concurrently}}
 
   fix_lifetime %rawPointer : $Builtin.RawPointer
   // expected-note @-1 {{access can happen concurrently}}
-  // expected-note @-2 {{access can happen concurrently}}
 
   end_borrow %valueB : $SendableKlass
   destroy_value %value : $SendableKlass
